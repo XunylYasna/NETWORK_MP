@@ -11,7 +11,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 
-import java.net.URL;
+import java.io.IOException;
+import java.net.*;
 import java.util.ResourceBundle;
 
 public class gameController implements Initializable {
@@ -36,12 +37,19 @@ public class gameController implements Initializable {
     @FXML
     public TextField challengeTF;
 
+//    Game
+
     String name;
-    String port;
+    int port;
     String ip;
 
     String letter = "";
     String direction = "";
+
+//    Network
+    private DatagramSocket datagramSocket;
+    private InetAddress inetAddress;
+    private Thread send;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -71,17 +79,62 @@ public class gameController implements Initializable {
 
     @FXML
     public void submit(ActionEvent event) {
+        String tosend = msgLbl.getText();
+        send(tosend.getBytes());
     }
 
     @FXML
     public void startGame(ActionEvent event) {
     }
 
+//    Network
     public boolean joinServer(){
-        System.out.println("Attempting to join server " + ip + ":" + port + " As " + name);
-        Boolean connected = false;
+        Boolean connected = true;
 
+        try {
+            datagramSocket = new DatagramSocket();
+            inetAddress = InetAddress.getByName(ip);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            return false;
+        } catch (SocketException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        System.out.println("Attempting to join server " + inetAddress + ":" + port + " As " + name);
+        String connect = "/c/" + name;
+        send(connect.getBytes());
         return connected;
+    }
+
+    private String receive(){
+        byte[] data = new byte[1024];
+        DatagramPacket datagramPacket = new DatagramPacket(data, data.length);
+
+        try {
+            datagramSocket.receive(datagramPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String message = new String(datagramPacket.getData());
+
+        return message;
+    }
+
+    private void send(final byte[] bytes){
+        send = new Thread("Send"){
+            public void run(){
+                DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length, inetAddress, port);
+                try {
+                    datagramSocket.send(datagramPacket);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        send.start();
     }
 
     public void setName(String name) {
@@ -89,7 +142,7 @@ public class gameController implements Initializable {
     }
 
     public void setPort(String port) {
-        this.port = port;
+        this.port = Integer.parseInt(port);
     }
 
     public void setIp(String ip) {
