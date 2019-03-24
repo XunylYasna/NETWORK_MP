@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Client.controller.lobbyController">
+   <children>
+      <Label layoutX="176.0" layoutY="61.0" text="Typewriter.">
+         <font>
+            <Font name="Consolas" size="41.0" />
+         </font>
+      </Label>
+      <TextField fx:id="userTF" layoutX="176.0" layoutY="185.0" prefHeight="26.0" prefWidth="200.0" />
+      <Label layoutX="93.0" layoutY="185.0" text="Name:">
+         <font>
+            <Font name="Consolas" size="22.0" />
+         </font>
+      </Label>
+      <TextField fx:id="ipTF" layoutX="176.0" layoutY="227.0" prefHeight="26.0" prefWidth="200.0" />
+      <Label layoutX="26.0" layoutY="227.0" text="IP Address:">
+         <font>
+            <Font name="Consolas" size="22.0" />
+         </font>
+      </Label>
+      <TextField fx:id="portTF" layoutX="176.0" layoutY="269.0" prefHeight="26.0" prefWidth="200.0" />
+      <Label layoutX="99.0" layoutY="269.0" text="Port:">
+         <font>
+            <Font name="Consolas" size="22.0" />
+         </font>
+      </Label>
+      <Button layoutX="478.0" layoutY="332.0" mnemonicParsing="false" onAction="#join" text="Join!">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font>
+      </Button>
+      <Button layoutX="380.0" layoutY="332.0" mnemonicParsing="false" onAction="#instructions" text="How to Play">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>
