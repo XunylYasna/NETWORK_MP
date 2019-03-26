@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.net.*;
 import java.util.ResourceBundle;
 
-public class gameController implements Initializable {
+public class gameController implements Initializable, Runnable {
     @FXML
     public Button subBtn;
     @FXML
@@ -49,7 +49,13 @@ public class gameController implements Initializable {
 //    Network
     private DatagramSocket datagramSocket;
     private InetAddress inetAddress;
-    private Thread send;
+    private Thread run,send, listen;
+    private boolean running;
+
+
+//    Turn
+    private boolean turn = true;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -87,6 +93,18 @@ public class gameController implements Initializable {
     public void startGame(ActionEvent event) {
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPort(String port) {
+        this.port = Integer.parseInt(port);
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
 //    Network
     public boolean joinServer(){
         Boolean connected = true;
@@ -105,7 +123,39 @@ public class gameController implements Initializable {
         System.out.println("Attempting to join server " + inetAddress + ":" + port + " As " + name);
         String connect = "/c/" + name;
         send(connect.getBytes());
+
+        String status = receive();
+
+        if(status.startsWith("/j/")){
+            connected = true;
+            System.out.println("Successfully Connected!");
+            running = true;
+            run = new Thread(this, "Running");
+            run.start();
+        }
+
+        else if(status.startsWith("/f/")){
+            System.out.println("Server Full!");
+            connected = false;
+        }
+
+        else{
+            System.out.println("Sever is not running!");
+            connected = false;
+        }
+
         return connected;
+    }
+
+    private void listen(){
+        listen = new Thread("Listen"){
+            public void run(){
+                while(running && turn){
+                    String fromServer = receive();
+                }
+            }
+        };
+        listen.start();
     }
 
     private String receive(){
@@ -137,15 +187,35 @@ public class gameController implements Initializable {
         send.start();
     }
 
-    public void setName(String name) {
-        this.name = name;
+    @Override
+    public void run() {
+        listen();
     }
 
-    public void setPort(String port) {
-        this.port = Integer.parseInt(port);
-    }
+    private void processServerMessage(String message){
+      if(message.startsWith("/a/")){
 
-    public void setIp(String ip) {
-        this.ip = ip;
+      }
+      
     }
 }
+
+//lagay sa prcoess sercer message
+
+//      /a/ challenge
+//          This is sent when the player challenges the previous player
+//      /o/ other players turn
+//          This is sent to signify whose turn is it
+//      /t/ your turn
+//          This is sent to signify whose turn is it
+//      /u/ curent game string
+//          This is sent to all players when a player moves <current game string>
+//      /g/ game start
+//          This is sent to all players when a player starts the game
+//      /i/ Player id
+//          This is sent to a player that just joined a server <1-4>
+//      /j/ joined the server
+//          This is sent to all players when a player joins a server <name>
+//      /e/ End
+//          This is sent to a player when someone already loses
+//      /f/ server full
