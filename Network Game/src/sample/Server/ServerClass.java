@@ -129,6 +129,8 @@ public class ServerClass implements Runnable{
         String received = new String(datagramPacket.getData());
         String substring = received.substring(3);
 
+        System.out.println(received);
+
         if(received.startsWith("/c/")){
             clientjoined(substring, datagramPacket);
         }
@@ -152,7 +154,8 @@ public class ServerClass implements Runnable{
 
     private void clientStarted(){
             sendToAll("/g/");
-            turn = 0;
+            turn = -1;
+            clientMoved("");
     }
 
     private void clientjoined(String substring, DatagramPacket datagramPacket){
@@ -195,11 +198,10 @@ public class ServerClass implements Runnable{
 
         // if the move is not a losing move
         else{
-            turn = (turn + 1) % 4;
-
+            turn = (turn + 1) % players.size();
             String pturn = "/t/";
             String pothers = "/o/It's " + players.get(turn).getName() + " turn.";
-
+            System.out.println(substring + "client moved substring");
             sendToAll("/u/" + substring); // send current substring to all players to update
 
             for(int i = 0; i < players.size(); i++){
