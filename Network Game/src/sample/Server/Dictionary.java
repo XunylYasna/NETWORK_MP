@@ -10,20 +10,28 @@ public class Dictionary {
     //private Set<String> wordsSet;
     HashSet<String> wordsSet = new HashSet<String>();
 
-    public Dictionary() throws IOException {
+    public Dictionary(){
         Path path = Paths.get("C:\\Users\\Lynux\\Desktop\\Network Game\\src\\sample\\Server\\words.txt");
-        byte[] readBytes = Files.readAllBytes(path);
-        String wordListContents = new String(readBytes, "UTF-8");
-        String[] words = wordListContents.split("\n");
+        byte[] readBytes = new byte[0];
+        try {
+            readBytes = Files.readAllBytes(path);
+            String wordListContents = new String(readBytes, "UTF-8");
+            String[] words = wordListContents.split("\n");
+            for(int i = 0; i < words.length; i++){
+                wordsSet.add(words[i].substring(0,words[i].length() - 1));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         //wordsSet = new HashSet<>();
         //Collections.addAll(wordsSet, words);
 
         /*instead of saying Collenctions.addAll, I thought using a loop to insert the values
           one by one would fix the problem, pero hindi parin pala
          */
-        for(int i = 0; i < words.length; i++){
-            wordsSet.add(words[i].substring(0,words[i].length() - 1));
-        }
+
 
 //        uncomment to print out all the words
 //        for (String temp : wordsSet) {

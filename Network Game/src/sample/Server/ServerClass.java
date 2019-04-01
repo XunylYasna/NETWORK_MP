@@ -15,7 +15,10 @@ public class ServerClass implements Runnable{
     private Thread run, manage, send, receive;
     private Boolean running = false;
 
+//    Game related
     private ArrayList<Player> players = new ArrayList<>();
+    Dictionary dictionary = new Dictionary();
+    int turn;
 
     public ServerClass(int port) {
         this.port = port;
@@ -123,35 +126,98 @@ public class ServerClass implements Runnable{
 
     private void processR(DatagramPacket datagramPacket){
         String received = new String(datagramPacket.getData());
-        if(received.startsWith("/c/")){
-            if(players.size() <= 4) {
-                Player join = new Player(received.substring(3), datagramPacket.getAddress(), datagramPacket.getPort(), players.size());
-                players.add(join);
-                System.out.println(players.get(players.size()-1).getName() + " joined the server");
-                sendToAll("/j/" + join.getName());
-            }
+        String substring = received.substring(3);
 
-            else{
-                String message = "/f/";
-                send(message.getBytes(), datagramPacket.getAddress(), datagramPacket.getPort());
-            }
+        if(received.startsWith("/c/")){
+            clientjoined(substring, datagramPacket);
 
         }
 
         else if(received.startsWith("/s/")){
-            String send = "Game is starting!";
+            clientStarted();
         }
 
         else if(received.startsWith("/m/")){
-
+            clientMoved(substring);
         }
 
         else if(received.startsWith("/h/")){
-
+            clientChallenged();
         }
 
         else{
             System.out.println(received);
+        }
+    }
+
+    private void clientStarted(){
+            sendToAll("/g/");
+            turn = 0;
+    }
+
+    private void clientjoined(String substring, DatagramPacket datagramPacket){
+        if(players.size() <= 4) {
+            Player join = new Player(substring, datagramPacket.getAddress(), datagramPacket.getPort(), players.size());
+            players.add(join);
+            System.out.println(players.get(players.size()-1).getName() + " joined the server");
+            sendToAll("/j/" + join.getName());
+        }
+
+        else{
+            String message = "/f/";
+            send(message.getBytes(), datagramPacket.getAddress(), datagramPacket.getPort());
+        }
+    }
+
+    private void clientMoved(String substring){
+
+        // if the move is a word
+        if(dictionary.checkWordExists(substring)){
+            Player playerthatMoved = players.get(turn);
+            String losingstring = "/e/" + playerthatMoved.getName() + " formed " + substring + " tangina wag ka puro porn mag basa ka din minsan";
+            sendToAll(losingstring);
+        }
+
+        // if the move is not a losing move
+        else{
+            turn = (turn + 1) % 4;
+
+            String pturn = "/t/";
+            String pothers = "/o/It's " + players.get(turn).getName() + " turn.";
+
+            sendToAll("/u/" + substring); // send current substring to all players to update
+
+            for(int i = 0; i < players.size(); i++){
+                Player player = players.get(i);
+                if(i == turn){
+                    send(pturn.getBytes(), player.getInetAddress(), player.getPort());
+                }
+
+                else{
+                    send(pothers.getBytes(), player.getInetAddress(), player.getPort());
+                }
+            }
+        }
+
+    }
+
+    private void clientChallenged(){
+
+        Player playerchallenged = players.get((turn - 1)%4);
+        Player playerissued = players.get(turn);
+
+        String challengestring = "/a/" + playerissued.getName() + "challeneged you to form a word based on your move";
+        String issuestring = "/o/" + playerissued.getName() + " challenged " + playerchallenged.getName() + " to form a word";
+
+        for(int i = 0; i < players.size(); i++){
+            Player player = players.get(i);
+            if(i == (turn - 1)%4){
+                send(challengestring.getBytes(), player.getInetAddress(), player.getPort());
+            }
+
+            else{
+                send(issuestring.getBytes(), player.getInetAddress(), player.getPort());
+            }
         }
     }
 }
