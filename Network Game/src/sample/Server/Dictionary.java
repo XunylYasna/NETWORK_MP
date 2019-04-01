@@ -11,7 +11,7 @@ public class Dictionary {
     HashSet<String> wordsSet = new HashSet<String>();
 
     public Dictionary(){
-        Path path = Paths.get("C:\\Users\\Lynux\\Desktop\\NETWORK_MP\\Network Game\\src\\sample\\Server\\words.txt");
+        Path path = Paths.get("src/sample/server/words.txt");
         byte[] readBytes = new byte[0];
         try {
             readBytes = Files.readAllBytes(path);

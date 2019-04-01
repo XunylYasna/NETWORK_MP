@@ -13,7 +13,6 @@ import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class gameController implements Initializable, Runnable {
@@ -47,6 +46,10 @@ public class gameController implements Initializable, Runnable {
     String letter = "";
     String direction = "";
 
+// UI updates
+
+    String players[];
+
 
 //    Network
     private DatagramSocket datagramSocket;
@@ -60,6 +63,13 @@ public class gameController implements Initializable, Runnable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         anchorPane.setOnKeyPressed(this::handleKeyPress);
+
+
+        subBtn.setDisable(true);
+        chBtn.setDisable(true);
+
+        challengeTF.setVisible(false);
+        challengeTF.setDisable(true);
     }
 
     private void handleKeyPress(KeyEvent event){
@@ -127,7 +137,6 @@ public class gameController implements Initializable, Runnable {
         String status = receive();
 
         if(status.startsWith("/j/")){
-            System.out.println(status + " eto yung sa status");
             processServerMessage(status);
             connected = true;
             System.out.println("Successfully Connected!");
@@ -161,6 +170,7 @@ public class gameController implements Initializable, Runnable {
             }
         };
         listen.start();
+        updateView();
     }
 
     private String receive(){
@@ -174,8 +184,6 @@ public class gameController implements Initializable, Runnable {
         }
 
         String message = new String(datagramPacket.getData());
-
-        System.out.println(message + "eto yung sa received");
         return message;
     }
 
@@ -231,17 +239,16 @@ public class gameController implements Initializable, Runnable {
     }
 
     public void playerJoined(String playernames){
-
         System.out.println(playernames);
-        String players[] = playernames.split(",");
+        players = playernames.split(",");
+    }
 
+    public void updateView(){
         p1Lbl.setText(players[0]);
         p2Lbl.setText(players[1]);
         p3Lbl.setText(players[2]);
         p4Lbl.setText(players[3]);
-
     }
-
 }
 
 //lagay sa prcoess server message

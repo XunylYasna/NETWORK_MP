@@ -11,7 +11,7 @@ public class Player {
     private int attempt = 0;
 
     public Player(String name, InetAddress inetAddress, int port, int ID) {
-        this.name = name;
+        this.name = name.substring(0,20);
         this.inetAddress = inetAddress;
         this.port = port;
         this.ID = ID;
