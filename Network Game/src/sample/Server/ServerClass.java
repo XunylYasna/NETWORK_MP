@@ -119,6 +119,7 @@ public class ServerClass implements Runnable{
 
     private void sendToAll(String message){
         for(int i = 0; i < players.size();i++){
+//            System.out.println(message + "to " + players.get(i).getName());
             Player player = players.get(i);
             send(message.getBytes(), player.getInetAddress(), player.getPort());
         }
@@ -130,7 +131,6 @@ public class ServerClass implements Runnable{
 
         if(received.startsWith("/c/")){
             clientjoined(substring, datagramPacket);
-
         }
 
         else if(received.startsWith("/s/")){
@@ -160,7 +160,22 @@ public class ServerClass implements Runnable{
             Player join = new Player(substring, datagramPacket.getAddress(), datagramPacket.getPort(), players.size());
             players.add(join);
             System.out.println(players.get(players.size()-1).getName() + " joined the server");
-            sendToAll("/j/" + join.getName());
+
+            String stringofplayernames = "";
+
+            for(int i = 0; i < players.size(); i++){
+                stringofplayernames+= players.get(i).getName() + ",";
+            }
+
+            for(int i = players.size(); i < 4; i++){
+                stringofplayernames+=" ,";
+            }
+
+            stringofplayernames += " ,";
+
+            stringofplayernames = "/j/"+stringofplayernames;
+            System.out.println(stringofplayernames);
+            sendToAll(stringofplayernames);
         }
 
         else{

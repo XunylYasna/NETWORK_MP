@@ -13,6 +13,7 @@ import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class gameController implements Initializable, Runnable {
@@ -46,6 +47,7 @@ public class gameController implements Initializable, Runnable {
     String letter = "";
     String direction = "";
 
+
 //    Network
     private DatagramSocket datagramSocket;
     private InetAddress inetAddress;
@@ -53,8 +55,6 @@ public class gameController implements Initializable, Runnable {
     private boolean running;
 
 
-//    Turn
-    private boolean turn = true;
 
 
     @Override
@@ -127,6 +127,8 @@ public class gameController implements Initializable, Runnable {
         String status = receive();
 
         if(status.startsWith("/j/")){
+            System.out.println(status + " eto yung sa status");
+            processServerMessage(status);
             connected = true;
             System.out.println("Successfully Connected!");
             running = true;
@@ -148,10 +150,13 @@ public class gameController implements Initializable, Runnable {
     }
 
     private void listen(){
+        System.out.println("listening");
         listen = new Thread("Listen"){
             public void run(){
-                while(running && turn){
+                while(running){
                     String fromServer = receive();
+                    System.out.println(fromServer + " received from server");
+                    processServerMessage(fromServer);
                 }
             }
         };
@@ -170,6 +175,7 @@ public class gameController implements Initializable, Runnable {
 
         String message = new String(datagramPacket.getData());
 
+        System.out.println(message + "eto yung sa received");
         return message;
     }
 
@@ -193,14 +199,52 @@ public class gameController implements Initializable, Runnable {
     }
 
     private void processServerMessage(String message){
-      if(message.startsWith("/a/")){
+        String substring = message.substring(3);
 
-      }
-      
+        if(message.startsWith("/a/")){
+
+        }
+
+        if(message.startsWith("/o/")){
+
+        }
+
+        if(message.startsWith("/t/")){
+
+        }
+
+        if(message.startsWith("/a/")){
+
+        }
+
+        if(message.startsWith("/g/")){
+
+        }
+
+        if(message.startsWith("/j/")){
+            playerJoined(substring);
+        }
+
+        if(message.startsWith("/e/")){
+
+        }
     }
+
+    public void playerJoined(String playernames){
+
+        System.out.println(playernames);
+        String players[] = playernames.split(",");
+
+        p1Lbl.setText(players[0]);
+        p2Lbl.setText(players[1]);
+        p3Lbl.setText(players[2]);
+        p4Lbl.setText(players[3]);
+
+    }
+
 }
 
-//lagay sa prcoess sercer message
+//lagay sa prcoess server message
 
 //      /a/ challenge
 //          This is sent when the player challenges the previous player
