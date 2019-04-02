@@ -266,11 +266,15 @@ public class gameController implements Initializable, Runnable {
 
     private void processServerMessage(String message){
         String substring = message.substring(3);
-
+        substring.trim();
         if(message.startsWith("/a/")){
+            labeltext = substring;
             challengeTF.setDisable(false);
             challengeTF.setVisible(true);
             turn = true;
+            dirb = true;
+            letterb = true;
+            isChallenged = true;
         }
 
         if(message.startsWith("/o/")){

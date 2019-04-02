@@ -21,6 +21,7 @@ public class ServerClass implements Runnable{
     private ArrayList<Player> players = new ArrayList<>();
     Dictionary dictionary = new Dictionary();
     int turn;
+    String currentString;
 
     public ServerClass(int port) {
         this.port = port;
@@ -194,9 +195,14 @@ public class ServerClass implements Runnable{
 
     private void clientMoved(String substring){
 
+        substring = substring.trim();
+        currentString = substring;
+
         // if the move is a word
         if(dictionary.checkWordExists(substring)){
             Player playerthatMoved = players.get(turn);
+
+            sendToAll("/u/" + substring);
             String losingstring = "/e/" + playerthatMoved.getName() + " formed " + substring + " tangina wag ka puro porn mag basa ka din minsan";
             sendToAll(losingstring);
         }
@@ -229,7 +235,7 @@ public class ServerClass implements Runnable{
         Player playerchallenged = players.get(abs((turn - 1)% players.size()));
         Player playerissued = players.get(turn);
 
-        String challengestring = "/a/" + playerissued.getName() + "challeneged you to form a word based on your move";
+        String challengestring = "/a/" + playerissued.getName() + "challenged you to form a word based on your move";
         String issuestring = "/o/" + playerissued.getName() + " challenged " + playerchallenged.getName() + " to form a word";
 
         for(int i = 0; i < players.size(); i++){
@@ -245,11 +251,23 @@ public class ServerClass implements Runnable{
     }
 
     private void challengeCheck(String substring){
-        if(dictionary.checkWordExists(substring)){
-            Player playerthatMoved = players.get(turn);
+        substring.trim();
+        Player playerthatMoved = players.get(turn);
+        System.out.println(currentString + " current string");
+        System.out.println(substring + " word from challenged");
+
+        if(substring.contains(currentString) && dictionary.checkWordExists(substring)){
             String winningstring = "/e/" + playerthatMoved.getName() + " formed " + substring + "challenge completed. "
-                                    + playerthatMoved.getName() + " wins.";
+                    + playerthatMoved.getName() + " wins.";
+
+            System.out.println(winningstring);
             sendToAll(winningstring);
+        }
+
+        else{
+            String losingString = "/e/" + playerthatMoved.getName() + " formed " + substring + ". challenge lost. ";
+            System.out.println(losingString);
+            sendToAll(losingString);
         }
     }
 }
