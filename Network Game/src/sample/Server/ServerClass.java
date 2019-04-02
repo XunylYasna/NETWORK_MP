@@ -22,6 +22,7 @@ public class ServerClass implements Runnable{
     Dictionary dictionary = new Dictionary();
     int turn;
     String currentString;
+    boolean gamestarted = false;
 
     public ServerClass(int port) {
         this.port = port;
@@ -159,13 +160,14 @@ public class ServerClass implements Runnable{
     }
 
     private void clientStarted(){
+            gamestarted = true;
             sendToAll("/g/");
             turn = -1;
             clientMoved("");
     }
 
     private void clientjoined(String substring, DatagramPacket datagramPacket){
-        if(players.size() <= 4) {
+        if(players.size() <= 4 && !gamestarted) {
             Player join = new Player(substring, datagramPacket.getAddress(), datagramPacket.getPort(), players.size());
             players.add(join);
             System.out.println(players.get(players.size()-1).getName() + " joined the server");
@@ -186,7 +188,7 @@ public class ServerClass implements Runnable{
             System.out.println(stringofplayernames);
             sendToAll(stringofplayernames);
         }
-
+        
         else{
             String message = "/f/";
             send(message.getBytes(), datagramPacket.getAddress(), datagramPacket.getPort());
@@ -203,7 +205,7 @@ public class ServerClass implements Runnable{
             Player playerthatMoved = players.get(turn);
 
             sendToAll("/u/" + substring);
-            String losingstring = "/e/" + playerthatMoved.getName() + " formed " + substring + " tangina wag ka puro porn mag basa ka din minsan";
+            String losingstring = "/e/" + playerthatMoved.getName() + " formed a word with " + substring;
             sendToAll(losingstring);
         }
 
@@ -253,11 +255,11 @@ public class ServerClass implements Runnable{
     private void challengeCheck(String substring){
         substring.trim();
         Player playerthatMoved = players.get(turn);
-        System.out.println(currentString + " current string");
-        System.out.println(substring + " word from challenged");
+        System.out.println(currentString + " current string " + substring.contains(currentString.toLowerCase()));
+        System.out.println(substring + " word from challenged " + dictionary.checkWordExists(substring));
 
-        if(substring.contains(currentString) && dictionary.checkWordExists(substring)){
-            String winningstring = "/e/" + playerthatMoved.getName() + " formed " + substring + "challenge completed. "
+        if(substring.contains(currentString.toLowerCase()) && dictionary.checkWordExists(substring.trim())){
+            String winningstring = "/e/" + playerthatMoved.getName() + " formed " + substring.trim() + ". challenge completed. "
                     + playerthatMoved.getName() + " wins.";
 
             System.out.println(winningstring);
@@ -265,7 +267,7 @@ public class ServerClass implements Runnable{
         }
 
         else{
-            String losingString = "/e/" + playerthatMoved.getName() + " formed " + substring + ". challenge lost. ";
+            String losingString = "/e/" + playerthatMoved.getName() + " formed " + substring.trim() + ". challenge lost. ";
             System.out.println(losingString);
             sendToAll(losingString);
         }

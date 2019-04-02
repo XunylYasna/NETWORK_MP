@@ -8,7 +8,7 @@
 
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Client.controller.gameController">
    <children>
-      <Label layoutX="176.0" layoutY="61.0" text="Typewriter.">
+      <Label layoutX="176.0" layoutY="59.0" text="Typewriter.">
          <font>
             <Font name="Consolas" size="41.0" />
          </font>
@@ -18,12 +18,12 @@
             <Font name="Consolas" size="12.0" />
          </font>
       </Button>
-      <Label fx:id="wordTF" layoutX="212.0" layoutY="176.0" text="&lt;Word&gt;">
+      <Label fx:id="wordTF" alignment="CENTER" layoutX="4.0" layoutY="176.0" prefHeight="48.0" prefWidth="591.0" text="&lt;Word&gt;" textAlignment="CENTER">
          <font>
             <Font name="Consolas" size="41.0" />
          </font>
       </Label>
-      <Label fx:id="msgLbl" layoutX="259.0" layoutY="231.0" text="Message">
+      <Label fx:id="msgLbl" alignment="CENTER" contentDisplay="CENTER" layoutX="5.0" layoutY="231.0" prefHeight="14.0" prefWidth="591.0" text="Message" textAlignment="CENTER">
          <font>
             <Font name="Consolas" size="11.0" />
          </font>
@@ -33,7 +33,7 @@
             <Font name="Consolas" size="12.0" />
          </font>
       </Button>
-      <Button fx:id="startGameBtn" layoutX="212.0" layoutY="184.0" mnemonicParsing="false" onAction="#startGame" text="Press to Start Game">
+      <Button fx:id="startGameBtn" layoutX="233.0" layoutY="184.0" mnemonicParsing="false" onAction="#startGame" text="Press to Start Game">
          <font>
             <Font name="Consolas" size="12.0" />
          </font>

@@ -266,7 +266,7 @@ public class gameController implements Initializable, Runnable {
 
     private void processServerMessage(String message){
         String substring = message.substring(3);
-        substring.trim();
+        substring = substring.trim();
         if(message.startsWith("/a/")){
             labeltext = substring;
             challengeTF.setDisable(false);
@@ -275,6 +275,7 @@ public class gameController implements Initializable, Runnable {
             dirb = true;
             letterb = true;
             isChallenged = true;
+            chBtn.setDisable(true);
         }
 
         if(message.startsWith("/o/")){
@@ -300,6 +301,7 @@ public class gameController implements Initializable, Runnable {
 
         if(message.startsWith("/e/")){
             labeltext = substring;
+            chBtn.setDisable(false);
         }
 
         if(message.startsWith("/u/")){
