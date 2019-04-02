@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+import static java.lang.Math.abs;
+
 public class ServerClass implements Runnable{
 
     private DatagramSocket datagramSocket;
@@ -97,7 +99,8 @@ public class ServerClass implements Runnable{
 //          This is received when the submit button is press gets <letter> <direction>
 //      /h/ challenge
 //          This is received when a player challenges another player
-
+//      /x/ challenge answered
+//          This is received whenever a player has already submitted a letter
 //    Server to Client commands
 //      /a/ challenge
 //          This is sent when the player challenges the previous player
@@ -146,7 +149,9 @@ public class ServerClass implements Runnable{
         else if(received.startsWith("/h/")){
             clientChallenged();
         }
-
+        else if(received.startsWith("/x/")){
+            challengeCheck(substring);
+        }
         else{
             System.out.println(received);
         }
@@ -201,7 +206,7 @@ public class ServerClass implements Runnable{
             turn = (turn + 1) % players.size();
             String pturn = "/t/";
             String pothers = "/o/It's " + players.get(turn).getName() + " turn.";
-            System.out.println(substring + "client moved substring");
+            System.out.println(substring + " client moved substring");
             sendToAll("/u/" + substring); // send current substring to all players to update
 
             for(int i = 0; i < players.size(); i++){
@@ -220,7 +225,8 @@ public class ServerClass implements Runnable{
 
     private void clientChallenged(){
 
-        Player playerchallenged = players.get((turn - 1)%4);
+
+        Player playerchallenged = players.get(abs((turn - 1)% players.size()));
         Player playerissued = players.get(turn);
 
         String challengestring = "/a/" + playerissued.getName() + "challeneged you to form a word based on your move";
@@ -228,13 +234,22 @@ public class ServerClass implements Runnable{
 
         for(int i = 0; i < players.size(); i++){
             Player player = players.get(i);
-            if(i == (turn - 1)%4){
+            if(i == (abs((turn - 1)% players.size()))){
                 send(challengestring.getBytes(), player.getInetAddress(), player.getPort());
             }
 
             else{
                 send(issuestring.getBytes(), player.getInetAddress(), player.getPort());
             }
+        }
+    }
+
+    private void challengeCheck(String substring){
+        if(dictionary.checkWordExists(substring)){
+            Player playerthatMoved = players.get(turn);
+            String winningstring = "/e/" + playerthatMoved.getName() + " formed " + substring + "challenge completed. "
+                                    + playerthatMoved.getName() + " wins.";
+            sendToAll(winningstring);
         }
     }
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLOutput;
 import java.util.HashSet;
 
 public class Dictionary {
@@ -18,7 +19,10 @@ public class Dictionary {
             String wordListContents = new String(readBytes, "UTF-8");
             String[] words = wordListContents.split("\n");
             for(int i = 0; i < words.length; i++){
-                wordsSet.add(words[i].substring(0,words[i].length() - 1));
+                if(words[i].substring(0,words[i].length() - 1).length() > 2){
+                    wordsSet.add(words[i].substring(0,words[i].length() - 1).toLowerCase());
+                }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -40,12 +44,14 @@ public class Dictionary {
 //        }
 
         //.contains the word massive, but sadly it prints out false
-//        System.out.println(wordsSet.contains("massive"));
+        System.out.println(wordsSet.contains("dead"));
 
     }
 
     public boolean checkWordExists(String word)
     {
-        return wordsSet.contains(word);
+        word = word.trim();
+        System.out.println(word+"123 " + wordsSet.contains(word.toLowerCase()));
+        return wordsSet.contains(word.toLowerCase());
     }
 }

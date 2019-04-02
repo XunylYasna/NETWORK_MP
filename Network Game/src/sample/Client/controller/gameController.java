@@ -1,9 +1,7 @@
 package sample.Client.controller;
 
-import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -12,8 +10,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.Duration;
-
 import java.io.IOException;
 import java.net.*;
 import java.util.ResourceBundle;
@@ -56,7 +52,7 @@ public class gameController implements Initializable, Runnable {
 
     boolean letterb = false;
     boolean dirb = false;
-
+    boolean isChallenged = false;
 // UI updates
 
     String players[];
@@ -83,51 +79,68 @@ public class gameController implements Initializable, Runnable {
 
     private void handleKeyPress(KeyEvent event){
 //        System.out.println(event.getCode());
-        if(event.getCode().isLetterKey()){
-            letter = event.getCode().getChar();
-            msgLbl.setText(letter + direction);
-            letterb = true;
-            subBtn.setDisable(!(dirb));
+        if(turn){
+            if(event.getCode().isLetterKey()){
+                letter = event.getCode().getChar();
+                msgLbl.setText(letter + direction);
+                letterb = true;
+                subBtn.setDisable(!(dirb));
+            }
+
+            if(event.getCode() == KeyCode.DIGIT1){
+                direction = " before";
+                msgLbl.setText(letter + direction);
+                dirb = true;
+                subBtn.setDisable(!(letterb));
+            }
+
+            if(event.getCode() == KeyCode.DIGIT2){
+                direction = " after";
+                msgLbl.setText(letter + direction);
+                dirb = true;
+                subBtn.setDisable(!(letterb));
+            }
         }
 
-        if(event.getCode() == KeyCode.DIGIT1){
-            direction = " before";
-            msgLbl.setText(letter + direction);
-            dirb = true;
-            subBtn.setDisable(!(letterb));
-        }
-
-        if(event.getCode() == KeyCode.DIGIT2){
-            direction = " after";
-            msgLbl.setText(letter + direction);
-            dirb = true;
-            subBtn.setDisable(!(letterb));
-        }
     }
 
     @FXML
     public void challenge(ActionEvent event) {
         String tosend = "/h/";
         send(tosend.getBytes());
+
+
     }
 
     @FXML
     public void submit(ActionEvent event) {
-        if(direction.equals(" after")){
-            currentgameString = currentgameString + letter;
+        if(isChallenged){
+            String tosend = "/x/" + challengeTF.getText();
+            tosend = tosend.trim().replaceAll(" +", "");
+            System.out.println(tosend + " challenge to send");
+            send(tosend.getBytes());
         }
+        else {
+            currentgameString = currentgameString.trim();
+            letter = letter.trim();
 
-        else{
-            currentgameString = letter + currentgameString;
+            if (direction.equals(" after")) {
+                currentgameString = currentgameString + letter;
+            } else {
+                currentgameString = letter + currentgameString;
+            }
+
+            letterb = false;
+            dirb = false;
+
+            String tosend = "/m/" + currentgameString;
+            tosend = tosend.trim().replaceAll(" +", "");
+            System.out.println(tosend + " move to send");
+            send(tosend.getBytes());
+
+            letter = "";
+            direction = "";
         }
-
-        letterb = false;
-        dirb = false;
-
-        String tosend = "/m/" + currentgameString;
-        tosend = tosend.trim().replaceAll(" +", "");
-        System.out.println(tosend + " move to send");
-        send(tosend.getBytes());
     }
 
     @FXML
@@ -257,14 +270,17 @@ public class gameController implements Initializable, Runnable {
         if(message.startsWith("/a/")){
             challengeTF.setDisable(false);
             challengeTF.setVisible(true);
+            turn = true;
         }
 
         if(message.startsWith("/o/")){
             labeltext = substring;
+            turn = false;
         }
 
         if(message.startsWith("/t/")){
             labeltext = "It's your turn!";
+            turn = true;
         }
 
         if(message.startsWith("/g/")){
@@ -300,12 +316,15 @@ public class gameController implements Initializable, Runnable {
         p3Lbl.setText(players[2]);
         p4Lbl.setText(players[3]);
 
-        subBtn.setDisable(!turn);
+        subBtn.setDisable(!(turn&&dirb&&letterb));
         chBtn.setDisable(!turn);
 
         wordTF.setText(currentgameString);
         msgLbl.setText(labeltext);
-        anchorPane.requestFocus();
+
+        if(turn == true){
+            anchorPane.requestFocus();
+        }
     }
 }
 
